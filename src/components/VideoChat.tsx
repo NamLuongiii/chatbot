@@ -427,6 +427,16 @@ export default function VideoChat({configChatbot, video, music}: Props) {
 
 
     return <div>
+        {music?.musicAvatar.url && (
+            <audio
+                ref={audioRef}
+                src={music?.musicAvatar.url}
+                loop
+                autoPlay
+                muted={false}
+                style={{display: "none"}}
+            />
+        )}
         <video
             ref={defaultVideoRef}
             src={video.video_url}

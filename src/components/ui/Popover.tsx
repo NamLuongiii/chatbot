@@ -30,13 +30,9 @@ const slideDown = keyframes`
 
 const Content = styled(PopoverPrimitive.Content)`
     z-index: 50;
-    background: #fff;
-    border-radius: 1rem;
     display: flex;
     flex-direction: column;
     place-items: center;
-
-    box-shadow: var(--shadow-light);
     outline: none;
 
     &[data-state="open"] {
