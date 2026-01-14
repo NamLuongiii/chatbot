@@ -22,12 +22,12 @@ type Props = {
     isDesktop: boolean
 }
 
-export default function Input({configChatbot, isDesktop}: Props) {
+export default function Input({configChatbot}: Props) {
     const [isRecording, setIsRecording] = useState(false)
     const [micAvailable, setMicAvailable] = useState(true)
     const inputRef = useRef<HTMLInputElement>(null)
     const [value, setValue] = useState('')
-    const [showInput, setShowInput] = useState(isDesktop)
+    const [showInput, setShowInput] = useState(true)
 
     const {mutate: sendMessage, isPending} = useMutation({
         mutationKey: ['send-message'],
