@@ -171,13 +171,6 @@ const InputContainer = styled.div`
             color: rgba(145, 158, 171, 1);
         }
     }
-
-    @media (max-width: 768px) {
-        input {
-            display: none;
-        }
-    }
-
 `
 
 const RecordingContainer = styled.div`
