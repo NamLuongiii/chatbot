@@ -8,6 +8,7 @@ import {toast} from "sonner";
 import {useMutation} from "@tanstack/react-query";
 import Service from "../service.ts";
 import type {ChatBotTextRequest, ResponseConfigChatBotType} from "../types.ts";
+import {useAppState} from "../AppStateContext.tsx";
 
 let recorder: {
     stop: () => Promise<{
@@ -28,6 +29,7 @@ export default function Input({configChatbot}: Props) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [value, setValue] = useState('')
     const [showInput, setShowInput] = useState(true)
+    const {isVideoReady} = useAppState()
 
     const {mutate: sendMessage, isPending} = useMutation({
         mutationKey: ['send-message'],
@@ -93,6 +95,10 @@ export default function Input({configChatbot}: Props) {
             message: value,
         })
     }
+
+    if (!isVideoReady) return null;
+
+    if (isPending) return <ThinkingUi>Thinking...</ThinkingUi>;
 
     return <Container>
         {isRecording && <RecordingContainer>
@@ -229,6 +235,15 @@ const ButtonRecording = styled.button`
             opacity: 0;
         }
     }
+`
+
+const ThinkingUi = styled.div`
+    position: absolute;
+    color: white;
+    left: 0;
+    right: 0;
+    bottom: 1rem;
+    text-align: center;
 `
 
 async function recordAudio() {

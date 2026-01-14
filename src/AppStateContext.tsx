@@ -7,12 +7,12 @@ import {ConnectionStatus} from "./types.ts";
  * ===================== */
 interface AppState {
     connection: ConnectionStatus
-    isVideoPlaying: boolean
+    isVideoReady: boolean
     isLoadingConfig: boolean
     isLoadedConfig: boolean
 
     setConnection: (status: ConnectionStatus) => void
-    setVideoPlaying: (value: boolean) => void
+    setVideoReady: (value: boolean) => void
     setLoadingConfig: (value: boolean) => void
     setLoadedConfig: (value: boolean) => void
 }
@@ -29,18 +29,18 @@ export function AppStateProvider({children}: { children: ReactNode }) {
     const [connection, setConnection] = useState<ConnectionStatus>(
         ConnectionStatus.DISCONNECTED
     )
-    const [isVideoPlaying, setVideoPlaying] = useState(false)
+    const [isVideoReady, setVideoReady] = useState(false)
     const [isLoadingConfig, setLoadingConfig] = useState(false)
     const [isLoadedConfig, setLoadedConfig] = useState(false)
 
     const value: AppState = {
         connection,
-        isVideoPlaying,
+        isVideoReady,
         isLoadingConfig,
         isLoadedConfig,
 
         setConnection,
-        setVideoPlaying,
+        setVideoReady,
         setLoadingConfig,
         setLoadedConfig,
     }

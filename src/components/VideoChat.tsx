@@ -24,9 +24,8 @@ export default function VideoChat({configChatbot, video, music}: Props) {
 
     const [videoStyles, setVideoStyles] = useState<CSSProperties>({});
     const defaultVideoRef = useRef<HTMLVideoElement | null>(null);
-    const [videoReady, setVideoReady] = useState<boolean>(false);
     const [streamVideoHasData, setStreamVideoHasData] = useState<boolean>(false);
-    const {setConnection} = useAppState()
+    const {setConnection, isVideoReady, setVideoReady} = useAppState()
 
     const cleanupConnection = () => {
         // Close and clean up peer connection
@@ -283,6 +282,7 @@ export default function VideoChat({configChatbot, video, music}: Props) {
                                 .play()
                                 .then(() => {
                                     setStreamVideoHasData(true);
+                                    setVideoReady(true);
                                 })
                                 .catch((error) => {
                                     console.error("Error playing stream video:", error);
@@ -293,6 +293,7 @@ export default function VideoChat({configChatbot, video, music}: Props) {
                     remoteViewRef.current.oncanplay = () => {
                         // Wait until the stream has enough data, then switch when ready
                         // This creates the most seamless experience
+                        setVideoReady(true)
                     };
                 }
             };
@@ -371,7 +372,7 @@ export default function VideoChat({configChatbot, video, music}: Props) {
             const err = error as Error;
             console.error("Viewer init error:", err);
         }
-    }, [configChatbot])
+    }, [configChatbot, setConnection])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
     useEffect(() => {
@@ -391,12 +392,12 @@ export default function VideoChat({configChatbot, video, music}: Props) {
     useEffect(() => {
         // Add a video frame extraction when the default video is playing
         // This lets us extract the exact frame and appearance to match in the stream video
-        if (defaultVideoRef.current && !videoReady) {
+        if (defaultVideoRef.current && !isVideoReady) {
             defaultVideoRef.current.addEventListener("playing", () => {
                 setVideoReady(true);
             });
         }
-    }, [videoReady]);
+    }, [isVideoReady, setVideoReady]);
 
     useEffect(() => {
         if (music?.musicAvatar.url && audioRef.current) {
