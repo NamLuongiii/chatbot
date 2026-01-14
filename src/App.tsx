@@ -7,6 +7,7 @@ import styled from "styled-components";
 import {useIsMobile} from "./components/ui/useMediaQuery.ts";
 import {BottomDrawer} from "./components/ui/Drawer.tsx";
 import {useState} from "react";
+import {AppStateProvider} from "./AppStateContext.tsx";
 
 function ErrorFallback({error, resetErrorBoundary}: { error: Error; resetErrorBoundary: () => void }) {
     return (
@@ -27,7 +28,9 @@ function App() {
             <button type="button" onClick={() => setOpen(true)}>Open</button>
             <BottomDrawer open={open} onOpenChange={setOpen}>
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <Chatbot isDesktop={false}/>
+                    <AppStateProvider>
+                        <Chatbot isDesktop={false}/>
+                    </AppStateProvider>
                 </ErrorBoundary>
             </BottomDrawer>
         </WidgetStyled>
@@ -39,7 +42,9 @@ function App() {
                 <PopoverTrigger>Open</PopoverTrigger>
                 <PopoverContent>
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
-                        <Chatbot isDesktop={true}/>
+                        <AppStateProvider>
+                            <Chatbot isDesktop={true}/>
+                        </AppStateProvider>
                     </ErrorBoundary>
                 </PopoverContent>
             </Popover>
@@ -59,4 +64,6 @@ const WidgetStyled = styled.div`
 
 const ErrorBoundaryStyled = styled.div`
     padding: 1rem;
+    box-shadow: var(--shadow-light);
+    border-radius: 1rem;
 `

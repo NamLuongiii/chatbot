@@ -38,7 +38,28 @@ export interface ResponseConfigChatBotType {
 }
 
 export interface ChatBotTextRequest {
-    session_id: string | undefined;
-    digital_human_id: string;
+    session_id: string;
     message: string;
+}
+
+export interface SpeechToTextRequest {
+    session_id: string;
+    audio: Blob;
+}
+
+export interface SpeechToTextResponse {
+    data: {
+        text: string;
+    };
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+export enum ConnectionStatus {
+    NEW = "new",
+    CONNECTING = "connecting",
+    CONNECTED = "connected",
+    DISCONNECTED = "disconnected",
+    CLOSED = "closed",
+    FAILED = "failed",
 }

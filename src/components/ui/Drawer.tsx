@@ -41,6 +41,7 @@ const Content = styled(Drawer.Content)`
     z-index: 5000;
 
     border-radius: 16px 16px 0 0;
+    background: white;
     animation: ${slideUp} 0.25s ease-out;
 
     max-height: 90vh;
@@ -70,6 +71,7 @@ const Body = styled.div`
     -ms-overflow-style: none;
     display: flex;
     justify-content: center;
+    padding: 1rem;
 `
 
 /* ---------------- component ---------------- */
@@ -89,7 +91,7 @@ export function BottomDrawer({
         <Drawer.Root open={open} onOpenChange={onOpenChange}>
             <Drawer.Portal>
                 {/*<Overlay/>*/}
-                <Content>
+                <Content aria-describedby="drawer-1-desc">
                     {/*<Handle/>*/}
                     <Body>{children}</Body>
                 </Content>

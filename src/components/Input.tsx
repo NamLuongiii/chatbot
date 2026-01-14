@@ -9,17 +9,25 @@ import {useMutation} from "@tanstack/react-query";
 import Service from "../service.ts";
 import type {ChatBotTextRequest, ResponseConfigChatBotType} from "../types.ts";
 
-let recorder: { stop: () => Promise<unknown> };
+let recorder: {
+    stop: () => Promise<{
+        blob: Blob,
+        url: string,
+        type: string,
+    }>
+};
 
 type Props = {
     configChatbot: ResponseConfigChatBotType
+    isDesktop: boolean
 }
 
-export default function Input({configChatbot}: Props) {
+export default function Input({configChatbot, isDesktop}: Props) {
     const [isRecording, setIsRecording] = useState(false)
     const [micAvailable, setMicAvailable] = useState(true)
     const inputRef = useRef<HTMLInputElement>(null)
     const [value, setValue] = useState('')
+    const [showInput, setShowInput] = useState(isDesktop)
 
     const {mutate: sendMessage, isPending} = useMutation({
         mutationKey: ['send-message'],
@@ -37,17 +45,15 @@ export default function Input({configChatbot}: Props) {
         playSound();
 
         try {
-            recorder = await recordAudio()
+            recorder = await recordAudio();
             setMicAvailable(true)
         } catch (error) {
             console.error('Error accessing microphone!', error);
             toast.error('Error accessing microphone!');
             setMicAvailable(false)
 
-            // show input
-            if (inputRef.current) {
-                inputRef.current.style.display = 'block'
-            }
+            // show input if mic unavailable
+            setShowInput(true)
             return;
         }
 
@@ -62,7 +68,21 @@ export default function Input({configChatbot}: Props) {
         if (!recorder) return;
 
         const audio = await recorder.stop()
-        console.log(audio)
+
+        try {
+            const text = await Service.convertAudioToText({
+                audio: audio.blob,
+                session_id: configChatbot.sessionId,
+            })
+
+            sendMessage({
+                session_id: configChatbot.sessionId,
+                message: text,
+            })
+        } catch (error) {
+            console.error('Error converting audio to text:', error)
+            toast.error('Error converting audio to text')
+        }
     }
 
     const handleSend = () => {
@@ -70,7 +90,6 @@ export default function Input({configChatbot}: Props) {
         setValue('')
         sendMessage({
             session_id: configChatbot.sessionId,
-            digital_human_id: String(Service.DH_ID),
             message: value,
         })
     }
@@ -84,23 +103,28 @@ export default function Input({configChatbot}: Props) {
         </RecordingContainer>}
 
         {!isRecording && (
-            <InputContainer>
-                <input
-                    ref={inputRef}
-                    type="text"
-                    placeholder="Type here..."
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        handleSend();
-                    }
-                }}
-                    disabled={isPending}
-                />
-                <ButtonRecord typeof='button' onClick={handleMicClick}>
+            showInput ? (
+                <InputContainer>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        placeholder="Type here..."
+                        value={value}
+                        onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSend();
+                        }
+                    }}
+                        disabled={isPending}
+                    />
+                    <ButtonRecord typeof='button' onClick={handleMicClick}>
+                        <img src={micAvailable ? mic : micOff} alt="Mic icon"/>
+                    </ButtonRecord>
+                </InputContainer>) : (
+                <ButtonRecord typeof='button' onClick={handleMicClick} style={{width: 56, height: 56,}}>
                     <img src={micAvailable ? mic : micOff} alt="Mic icon"/>
                 </ButtonRecord>
-            </InputContainer>
+            )
         )}
     </Container>
 }
@@ -111,33 +135,41 @@ const Container = styled.div`
     bottom: 0;
     left: 0;
     right: 0;
+
+    background: linear-gradient(
+            to top,
+            rgba(30, 41, 59, 0.6),
+            rgba(30, 41, 59, 0.25),
+            rgba(30, 41, 59, 0)
+    );
 `
 
 const InputContainer = styled.div`
-    padding: .2rem;
-    backdrop-filter: blur(20px);
-    margin: 1rem auto;
-    width: fit-content;
+    padding: 4px 16px;
+    border-radius: 8px;
 
     display: flex;
     justify-content: center;
     gap: .5rem;
+    margin: 1rem;
+
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 
     input {
         background: transparent;
-        color: white;
         border: none;
         outline: none;
         padding: .5rem;
+        flex: 1;
+        //color: black;
+        color: white;
+        font-size: 14px;
 
         &::placeholder {
-            color: #fff;
+            color: rgba(145, 158, 171, 1);
         }
-
-        &:focus {
-            outline: solid;
-        }
-
     }
 
     @media (max-width: 768px) {
@@ -155,13 +187,16 @@ const RecordingContainer = styled.div`
 `
 
 const ButtonRecord = styled.button`
-    aspect-ratio: 1/1;
-    display: inline-flex;
-    place-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: white;
     border-radius: 50%;
     cursor: pointer;
-    border: 1px solid #ccc;
+    border: none;
+    outline: none;
+    width: 32px;
+    height: 32px;
 
     &:hover {
         box-shadow: var(--shadow-dark);
@@ -236,5 +271,5 @@ async function recordAudio() {
 
                 mediaRecorder.stop();
             }),
-    };
+    } as never;
 }

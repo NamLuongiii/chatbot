@@ -1,24 +1,15 @@
 import type {Avatar, ResponseConfigChatBotType} from "../types.ts";
+import {ConnectionStatus} from '../types.ts'
 import {type CSSProperties, useCallback, useEffect, useRef, useState} from "react";
 import {Role, SignalingClient} from "amazon-kinesis-video-streams-webrtc";
 import KinesisVideo from "aws-sdk/clients/kinesisvideo";
 import KinesisVideoSignalingChannels from "aws-sdk/clients/kinesisvideosignalingchannels";
+import {useAppState} from "../AppStateContext.tsx";
 
 type Props = {
     configChatbot: ResponseConfigChatBotType
     video: Avatar['video'],
     music: Avatar['avatar']
-}
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-enum ConnectionState {
-    NEW = "new",
-    CONNECTING = "connecting",
-    CONNECTED = "connected",
-    DISCONNECTED = "disconnected",
-    CLOSED = "closed",
-    FAILED = "failed",
 }
 
 export default function VideoChat({configChatbot, video, music}: Props) {
@@ -35,7 +26,7 @@ export default function VideoChat({configChatbot, video, music}: Props) {
     const defaultVideoRef = useRef<HTMLVideoElement | null>(null);
     const [videoReady, setVideoReady] = useState<boolean>(false);
     const [streamVideoHasData, setStreamVideoHasData] = useState<boolean>(false);
-    const [, setConnectionState] = useState<ConnectionState>(ConnectionState.NEW);
+    const {setConnection} = useAppState()
 
     const cleanupConnection = () => {
         // Close and clean up peer connection
@@ -222,19 +213,19 @@ export default function VideoChat({configChatbot, video, music}: Props) {
 
             peerConnectionRef.current.onconnectionstatechange = () => {
                 const state = peerConnectionRef.current
-                    ?.connectionState as ConnectionState;
-                setConnectionState(state);
+                    ?.connectionState as ConnectionStatus;
+                setConnection(state);
                 switch (state) {
-                    case ConnectionState.NEW:
-                    case ConnectionState.CONNECTING:
+                    case ConnectionStatus.NEW:
+                    case ConnectionStatus.CONNECTING:
                         console.info("connecting");
                         break;
-                    case ConnectionState.CONNECTED:
+                    case ConnectionStatus.CONNECTED:
                         console.info("connected");
                         break;
-                    case ConnectionState.DISCONNECTED:
-                    case ConnectionState.CLOSED:
-                    case ConnectionState.FAILED:
+                    case ConnectionStatus.DISCONNECTED:
+                    case ConnectionStatus.CLOSED:
+                    case ConnectionStatus.FAILED:
                         console.info("disconnected");
                         break;
                     default:
