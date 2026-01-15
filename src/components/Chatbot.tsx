@@ -41,7 +41,7 @@ export default function Chatbot({isDesktop}: Props) {
         staleTime: Infinity
     })
 
-    const {isPending: isRefreshingConfig, mutate: refreshConfig, data: newChatbotConfig} = useMutation({
+    const {mutate: refreshConfig, data: newChatbotConfig} = useMutation({
         mutationKey: ['refresh-config'],
         mutationFn: (sessionId: string) => Service.refreshConfig(sessionId),
         onError: () => {
@@ -72,7 +72,7 @@ export default function Chatbot({isDesktop}: Props) {
         }
     }, [chatbotConfig?.sessionId])
 
-    if (isLoading || isPendingConfig || isRefreshingConfig || !chatbotConfig || !data) return (
+    if (isLoading || isPendingConfig || !chatbotConfig || !data) return (
         <ChatbotLoading>
             <div className="wave-dots">
                 <span></span>
