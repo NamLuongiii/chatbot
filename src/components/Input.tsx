@@ -76,21 +76,23 @@ export default function Input({configChatbot, isDesktop}: Props) {
             }
             setIsRecording(false);
 
-            mediaRecordedCurrent.onstop = async () => {
-                const audioBlob = new Blob(audioChunksRef.current, {
-                    type: "audio/wav",
-                });
+            try {
+                mediaRecordedCurrent.onstop = async () => {
+                    const audioBlob = new Blob(audioChunksRef.current, {
+                        type: "audio/wav",
+                    });
 
-                toast.message(audioBlob.size.toString())
-                
-                const message = await Service.convertAudioToText({
-                    session_id: configChatbot?.sessionId,
-                    audio: audioBlob,
-                });
+                    const message = await Service.convertAudioToText({
+                        session_id: configChatbot?.sessionId,
+                        audio: audioBlob,
+                    });
 
-
-                handleSend(message)
-            };
+                    handleSend(message)
+                };
+            } catch (error) {
+                toast.error("Error converting audio to text!");
+                console.error("Error converting audio to text:", error);
+            }
         }
     }
 
