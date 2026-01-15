@@ -62,8 +62,8 @@ export default App
 
 const WidgetStyled = styled.div`
     position: fixed;
-    bottom: 2rem;
-    right: 2rem;
+    bottom: 1rem;
+    right: 1rem;
     z-index: 1000;
 `
 

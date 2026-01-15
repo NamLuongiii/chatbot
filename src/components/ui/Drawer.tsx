@@ -40,6 +40,8 @@ const Content = styled(Drawer.Content)`
     left: 0;
     right: 0;
     z-index: 1000;
+    width: fit-content;
+    margin: 0 auto;
 
     border-radius: 16px 16px 0 0;
     background: white;
@@ -84,7 +86,7 @@ const Body = styled.div`
 export const CloseBtn = styled.button`
     position: absolute;
     top: 1.5rem;
-    right: 1.5rem;
+    right: 1.2rem;
     background: none;
     border: none;
     cursor: pointer;
