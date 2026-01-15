@@ -85,9 +85,6 @@ class Service {
         const response = await fetch(`${this.VITE_API_URL}/chat/${payload.session_id}/speech-to-text`, {
             method: 'POST',
             body: fd,
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
         })
 
         const json = await response.json();
