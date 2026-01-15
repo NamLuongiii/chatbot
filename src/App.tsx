@@ -7,6 +7,7 @@ import {useIsMobile} from "./components/ui/useMediaQuery.ts";
 import {BottomDrawer} from "./components/ui/Drawer.tsx";
 import {useState} from "react";
 import {AppStateProvider} from "./AppStateContext.tsx";
+import {TbMessageChatbot} from "react-icons/tb";
 
 function ErrorFallback({error, resetErrorBoundary}: { error: Error; resetErrorBoundary: () => void }) {
     return (
@@ -24,7 +25,9 @@ function App() {
 
     if (isMobile) return (
         <WidgetStyled id="widget-chatbot-root">
-            <button type="button" onClick={() => setOpen(true)}>Open</button>
+            <ButtonChat onClick={() => setOpen(true)}>
+                <TbMessageChatbot size={24}/>
+            </ButtonChat>
             <BottomDrawer open={open} onOpenChange={setOpen}>
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
                     <AppStateProvider>
@@ -38,7 +41,11 @@ function App() {
     return (
         <WidgetStyled id="widget-chatbot-root">
             <Popover>
-                <PopoverTrigger>Open</PopoverTrigger>
+                <PopoverTrigger asChild>
+                    <ButtonChat>
+                        <TbMessageChatbot size={24}/>
+                    </ButtonChat>
+                </PopoverTrigger>
                 <PopoverContent>
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
                         <AppStateProvider>
@@ -61,7 +68,20 @@ const WidgetStyled = styled.div`
 `
 
 const ErrorBoundaryStyled = styled.div`
-    padding: 1rem;
+    background: var(--primary-color);
+    padding: 4rem;
     box-shadow: var(--shadow-light);
     border-radius: 1rem;
+`
+
+const ButtonChat = styled.span`
+    width: 50px;
+    height: 50px;
+    display: flex;
+    background: cornflowerblue;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    border-radius: 32px;
+    cursor: pointer;
 `

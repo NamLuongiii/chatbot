@@ -1,13 +1,12 @@
-import mic from '../assets/mic.svg'
 import stop from '../assets/stop.svg'
 import styled from "styled-components";
 import {useRef, useState} from "react";
-import micOff from '../assets/mic_off.svg'
 import soundclick from '../assets/select-sound.wav'
-import {toast} from "sonner";
 import {useMutation} from "@tanstack/react-query";
 import Service from "../service.ts";
 import {type ChatBotTextRequest, ConnectionStatus, type ResponseConfigChatBotType} from "../types.ts";
+import {MdMic, MdMicOff, MdSend} from "react-icons/md";
+import {toast} from "sonner";
 import {useAppState} from "../AppStateContext.tsx";
 
 type Props = {
@@ -39,7 +38,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
         audio.play().catch(console.error);
     }
 
-    const handleMicClick = async () => {
+    const handleStartRecording = async () => {
         // play sound
         playSound();
 
@@ -88,6 +87,8 @@ export default function Input({configChatbot, isDesktop}: Props) {
                     audio: audioBlob,
                 });
 
+                toast.message(message)
+
                 sendMessage({
                     session_id: configChatbot.sessionId,
                     message,
@@ -103,6 +104,14 @@ export default function Input({configChatbot, isDesktop}: Props) {
             session_id: configChatbot.sessionId,
             message: value,
         })
+    }
+
+    const handleButton = () => {
+        if (value) {
+            handleSend()
+        } else {
+            handleStartRecording().then()
+        }
     }
 
     if (!isVideoReady || connection !== ConnectionStatus.CONNECTED) return null;
@@ -132,14 +141,18 @@ export default function Input({configChatbot, isDesktop}: Props) {
                     }}
                         disabled={isPending}
                     />
-                    <ButtonRecord typeof='button' onClick={handleMicClick}>
-                        <img src={micAvailable ? mic : micOff} alt="Mic icon"/>
+                    <ButtonRecord typeof='button' onClick={handleButton}>
+                        {value ? (
+                            <MdSend color='cornflowerblue'/>
+                        ) : (
+                            !micAvailable ? <MdMicOff size={16}/> : <MdMic size={16}/>
+                        )}
                     </ButtonRecord>
                 </InputContainer>) : (
 
-                <ButtonRecord typeof='button' onClick={handleMicClick}
+                <ButtonRecord typeof='button' onClick={handleButton}
                               style={{width: 56, height: 56, margin: '1rem', marginLeft: 'auto', marginRight: 'auto'}}>
-                    <img src={micAvailable ? mic : micOff} alt="Mic icon"/>
+                    {!micAvailable ? <MdMicOff size={24}/> : <MdMic size={24}/>}
                 </ButtonRecord>
             )
         )}
@@ -152,11 +165,12 @@ const Container = styled.div`
     bottom: 0;
     left: 0;
     right: 0;
+    margin-top: 2rem;
 
     background: linear-gradient(
             to top,
-            rgba(30, 41, 59, 0.6),
-            rgba(30, 41, 59, 0.25),
+            rgba(30, 41, 59, 0.9),
+            rgba(30, 41, 59, 0.8),
             rgba(30, 41, 59, 0)
     );
 `
@@ -167,6 +181,7 @@ const InputContainer = styled.div`
 
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: .5rem;
     margin: 1rem;
 
@@ -183,6 +198,7 @@ const InputContainer = styled.div`
         //color: black;
         color: white;
         font-size: 14px;
+        word-spacing: 1px;
 
         &::placeholder {
             color: rgba(145, 158, 171, 1);
@@ -210,6 +226,7 @@ const ButtonRecord = styled.button`
 
     &:hover {
         box-shadow: var(--shadow-dark);
+        outline: 2px solid cornflowerblue;
     }
 `
 

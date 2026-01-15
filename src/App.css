@@ -17,7 +17,7 @@
 .wave-dots span {
     width: 6px;
     height: 6px;
-    background: #6b7280;
+    background: cornflowerblue;
     border-radius: 50%;
     animation: waveDots 1.2s infinite ease-in-out;
 }

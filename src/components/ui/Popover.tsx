@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import styled, {keyframes} from "styled-components"
+import {IoClose} from "react-icons/io5"
 
 /* ---------------- animation ---------------- */
 
@@ -26,7 +27,7 @@ const slideDown = keyframes`
     }
 `
 
-/* ---------------- styles ---------------- */
+/* ---------------- styles (GIỮ NGUYÊN) ---------------- */
 
 const Content = styled(PopoverPrimitive.Content)`
     z-index: 50;
@@ -35,6 +36,8 @@ const Content = styled(PopoverPrimitive.Content)`
     place-items: center;
     outline: none;
 
+    position: relative; /* cần cho nút close */
+
     &[data-state="open"] {
         animation: ${slideUp} 0.16s ease-out;
     }
@@ -42,6 +45,22 @@ const Content = styled(PopoverPrimitive.Content)`
     &[data-state="closed"] {
         animation: ${slideDown} 0.12s ease-in;
     }
+`
+
+const CloseButton = styled(PopoverPrimitive.Close)`
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 60;
+
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `
 
 /* ---------------- components ---------------- */
@@ -62,6 +81,7 @@ function PopoverContent({
                             side = "top",
                             align = "end",
                             sideOffset = 8,
+                            children,
                             ...props
                         }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
     return (
@@ -70,8 +90,17 @@ function PopoverContent({
                 side={side}
                 align={align}
                 sideOffset={sideOffset}
+                onInteractOutside={(e) => e.preventDefault()}
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}     // ⛔ ESC
                 {...props}
-            />
+            >
+                <CloseButton aria-label="Close">
+                    <IoClose size={18}/>
+                </CloseButton>
+
+                {children}
+            </Content>
         </PopoverPrimitive.Portal>
     )
 }

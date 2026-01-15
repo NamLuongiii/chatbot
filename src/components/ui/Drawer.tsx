@@ -3,6 +3,7 @@
 import * as React from "react"
 import {Drawer} from "vaul"
 import styled, {keyframes} from "styled-components"
+import {IoClose} from "react-icons/io5";
 
 /* ---------------- animations ---------------- */
 
@@ -74,6 +75,17 @@ const Body = styled.div`
     padding: 1rem;
 `
 
+export const CloseBtn = styled.button`
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1100;
+    outline: none;
+`
+
 /* ---------------- component ---------------- */
 
 type BottomDrawerProps = {
@@ -96,6 +108,9 @@ export function BottomDrawer({
                 {/*<Overlay/>*/}
                 <Content aria-describedby="drawer-1-desc">
                     {/*<Handle/>*/}
+                    <CloseBtn onClick={() => onOpenChange(false)}>
+                        <IoClose size={24}/>
+                    </CloseBtn>
                     <Body>{children}</Body>
                 </Content>
             </Drawer.Portal>

@@ -461,16 +461,9 @@ export default function VideoChat({configChatbot, video, music}: Props) {
 }
 
 const VideoWrapper = styled.div`
-    //width: 100%;
-    //max-height: 500px;
-    //overflow: hidden; /* ⛔ chặn viền */
 `
 
 const VideoStyled = styled.video`
-    //width: 100%;
-    //height: 100%;
-    //object-fit: cover; /* 🔥 QUAN TRỌNG */
-    //background: transparent; /* fallback */
-    //object-position: top center; /* 🔥 chỉ crop bên dưới */
-    MAX-WIDTH: 100%;
+    max-width: 100%;
+    clip-path: inset(1px 1px);
 `;

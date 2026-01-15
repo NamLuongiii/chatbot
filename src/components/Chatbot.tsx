@@ -89,12 +89,15 @@ const ChatbotContainer = styled.div`
     border-radius: 1rem;
     overflow: hidden;
     box-shadow: var(--shadow-light);
-    max-height: 100vh;
+    max-height: 60vh;
     max-width: 100vw;
 `
 
 const ChatbotLoading = styled.div`
     background: var(--primary-color);
-    padding: 1rem;
+    padding: 4rem;
+    box-shadow: var(--shadow-light);
+    border-radius: 1rem;
+
 `
 
