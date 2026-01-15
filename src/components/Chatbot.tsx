@@ -91,6 +91,10 @@ const ChatbotContainer = styled.div`
     box-shadow: var(--shadow-light);
     max-height: 80vh;
     max-width: 100vw;
+
+    @media (max-width: 768px) {
+        max-width: 60vw; // for mobile
+    }
 `
 
 const ChatbotLoading = styled.div`
