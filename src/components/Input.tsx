@@ -156,6 +156,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
                 </InputContainer>) : (
 
                 <ButtonRecord typeof='button' onClick={handleButton}
+                              disabled={isDisabled}
                               style={{width: 56, height: 56, margin: '1rem', marginLeft: 'auto', marginRight: 'auto'}}>
                     {!micAvailable ? <MdMicOff size={24}/> : <MdMic size={24}/>}
                 </ButtonRecord>
