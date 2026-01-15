@@ -72,7 +72,7 @@ export default function Chatbot({isDesktop}: Props) {
         }
     }, [chatbotConfig?.sessionId])
 
-    if (isLoading || isPendingConfig || isRefreshingConfig) return (
+    if (isLoading || isPendingConfig || isRefreshingConfig || !chatbotConfig || !data) return (
         <ChatbotLoading>
             <div className="wave-dots">
                 <span></span>
