@@ -55,6 +55,12 @@ const Content = styled(Drawer.Content)`
         width: 420px;
         border-radius: 16px;
     }
+
+    &:focus,
+    &:focus-visible {
+        outline: none;
+        box-shadow: none;
+    }
 `
 
 // const Handle = styled.div`
