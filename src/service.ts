@@ -89,7 +89,7 @@ class Service {
 
         const json = await response.json();
         if (response.ok) {
-            toast.success(json.toString())
+            toast.success(json.data.text)
             return json.data.text;
         } else {
             toast.error(json.message || response.statusText)
