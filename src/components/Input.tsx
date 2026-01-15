@@ -28,7 +28,14 @@ export default function Input({configChatbot, isDesktop}: Props) {
 
     const {mutate: sendMessage, isPending} = useMutation({
         mutationKey: ['send-message'],
-        mutationFn: (payload: ChatBotTextRequest) => Service.sendTextMessage(payload)
+        mutationFn: (payload: ChatBotTextRequest) => Service.sendTextMessage(payload),
+        onError: err => toast.error(err.message)
+    })
+
+    const {mutateAsync: convertAudio, isPending: isConvertingAudio} = useMutation({
+        mutationKey: ['convert-audio'],
+        mutationFn: (payload: { session_id: string, audio: Blob }) => Service.convertAudioToText(payload),
+        onError: err => toast.error(err.message)
     })
 
     const playSound = () => {
@@ -64,6 +71,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
     const handleStopRecording = async () => {
         setIsRecording(false)
 
+
         playSound()
 
         const mediaRecordedCurrent = mediaRecorderRef.current;
@@ -76,23 +84,19 @@ export default function Input({configChatbot, isDesktop}: Props) {
             }
             setIsRecording(false);
 
-            try {
-                mediaRecordedCurrent.onstop = async () => {
-                    const audioBlob = new Blob(audioChunksRef.current, {
-                        type: "audio/wav",
-                    });
+            mediaRecordedCurrent.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, {
+                    type: "audio/wav",
+                });
 
-                    const message = await Service.convertAudioToText({
-                        session_id: configChatbot?.sessionId,
-                        audio: audioBlob,
-                    });
-
+                convertAudio({
+                    session_id: configChatbot?.sessionId,
+                    audio: audioBlob,
+                }).then(message => {
                     handleSend(message)
-                };
-            } catch (error) {
-                toast.error("Error converting audio to text!");
-                console.error("Error converting audio to text:", error);
-            }
+                })
+            };
+
         }
     }
 
@@ -116,7 +120,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
 
     // if (!isVideoReady || connection !== ConnectionStatus.CONNECTED) return null;
 
-    if (isPending) return <ThinkingUi>Thinking...</ThinkingUi>;
+    if (isPending || isConvertingAudio) return <ThinkingUi>Thinking...</ThinkingUi>;
 
     return <Container>
         {isRecording && <RecordingContainer>

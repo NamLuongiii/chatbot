@@ -1,5 +1,4 @@
 import type {ApiResponse, Avatar, ChatBotTextRequest, ResponseConfigChatBotType, SpeechToTextRequest} from "./types.ts";
-import {toast} from "sonner";
 
 class Service {
     VITE_API_URL: string;
@@ -77,7 +76,6 @@ class Service {
     }
 
     async convertAudioToText(payload: SpeechToTextRequest): Promise<string> {
-        toast.loading('Converting audio to text...')
         const fd = new FormData();
         fd.append('audio', payload.audio);
         fd.append('digital_human_id', this.DH_ID.toString());
@@ -89,10 +87,8 @@ class Service {
 
         const json = await response.json();
         if (response.ok) {
-            toast.success(json.data.text)
             return json.data.text;
         } else {
-            toast.error(json.message || response.statusText)
             throw new Error(json.message || response.statusText);
         }
     }
