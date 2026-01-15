@@ -93,7 +93,7 @@ const ChatbotContainer = styled.div`
     max-width: 100vw;
 
     @media (max-width: 768px) {
-        max-width: 60vw; // for mobile
+        max-height: 60vw; // for mobile
     }
 `
 
