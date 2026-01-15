@@ -38,7 +38,7 @@ export default function Chatbot({isDesktop}: Props) {
             return await Service.getChatBotConfig()
         },
         throwOnError: true,
-        // staleTime: Infinity
+        staleTime: Infinity
     })
 
     const {isPending: isRefreshingConfig, mutate: refreshConfig, data: newChatbotConfig} = useMutation({
