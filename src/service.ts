@@ -1,4 +1,5 @@
 import type {ApiResponse, Avatar, ChatBotTextRequest, ResponseConfigChatBotType, SpeechToTextRequest} from "./types.ts";
+import {toast} from "sonner";
 
 class Service {
     VITE_API_URL: string;
@@ -90,8 +91,10 @@ class Service {
 
         const json = await response.json();
         if (response.ok) {
+            toast.success(json.toString())
             return json.data.text;
         } else {
+            toast.error(json.message || response.statusText)
             throw new Error(json.message || response.statusText);
         }
     }
