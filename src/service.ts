@@ -77,6 +77,7 @@ class Service {
     }
 
     async convertAudioToText(payload: SpeechToTextRequest): Promise<string> {
+        toast.loading('Converting audio to text...')
         const fd = new FormData();
         fd.append('audio', payload.audio);
         fd.append('digital_human_id', this.DH_ID.toString());
