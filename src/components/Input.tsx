@@ -10,26 +10,23 @@ import Service from "../service.ts";
 import type {ChatBotTextRequest, ResponseConfigChatBotType} from "../types.ts";
 import {useAppState} from "../AppStateContext.tsx";
 
-let recorder: {
-    stop: () => Promise<{
-        blob: Blob,
-        url: string,
-        type: string,
-    }>
-};
-
 type Props = {
     configChatbot: ResponseConfigChatBotType
     isDesktop: boolean
 }
 
-export default function Input({configChatbot}: Props) {
+export default function Input({configChatbot, isDesktop}: Props) {
     const [isRecording, setIsRecording] = useState(false)
     const [micAvailable, setMicAvailable] = useState(true)
     const inputRef = useRef<HTMLInputElement>(null)
     const [value, setValue] = useState('')
-    const [showInput, setShowInput] = useState(true)
+    const [showInput, setShowInput] = useState(isDesktop)
     const {isVideoReady} = useAppState()
+
+    const streamRef = useRef<MediaStream | null>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+
 
     const {mutate: sendMessage, isPending} = useMutation({
         mutationKey: ['send-message'],
@@ -47,19 +44,23 @@ export default function Input({configChatbot}: Props) {
         playSound();
 
         try {
-            recorder = await recordAudio();
-            setMicAvailable(true)
+            streamRef.current = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+            });
+            mediaRecorderRef.current = new MediaRecorder(streamRef.current);
+            audioChunksRef.current = [];
+            mediaRecorderRef.current.ondataavailable = (event) => {
+                audioChunksRef.current.push(event.data);
+            };
+            mediaRecorderRef.current.start();
+
+            setIsRecording(true);
         } catch (error) {
-            console.error('Error accessing microphone!', error);
-            toast.error('Error accessing microphone!');
-            setMicAvailable(false)
-
-            // show input if mic unavailable
+            toast.error("Error accessing microphone!");
+            console.error("Error accessing microphone:", error);
             setShowInput(true)
-            return;
+            setMicAvailable(false)
         }
-
-        setIsRecording(!isRecording)
     }
 
     const handleStopRecording = async () => {
@@ -67,23 +68,31 @@ export default function Input({configChatbot}: Props) {
 
         playSound()
 
-        if (!recorder) return;
+        const mediaRecordedCurrent = mediaRecorderRef.current;
+        const streamRefCurrent = streamRef.current;
+        const audioChunksRefCurrent = audioChunksRef.current;
+        if (streamRefCurrent && mediaRecordedCurrent && audioChunksRefCurrent) {
+            mediaRecordedCurrent.stop();
+            for (const track of streamRefCurrent.getTracks()) {
+                track.stop();
+            }
+            setIsRecording(false);
 
-        const audio = await recorder.stop()
+            mediaRecordedCurrent.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, {
+                    type: "audio/wav",
+                });
 
-        try {
-            const text = await Service.convertAudioToText({
-                audio: audio.blob,
-                session_id: configChatbot.sessionId,
-            })
+                const message = await Service.convertAudioToText({
+                    session_id: configChatbot?.sessionId,
+                    audio: audioBlob,
+                });
 
-            sendMessage({
-                session_id: configChatbot.sessionId,
-                message: text,
-            })
-        } catch (error) {
-            console.error('Error converting audio to text:', error)
-            toast.error('Error converting audio to text')
+                sendMessage({
+                    session_id: configChatbot.sessionId,
+                    message,
+                })
+            };
         }
     }
 
@@ -127,7 +136,9 @@ export default function Input({configChatbot}: Props) {
                         <img src={micAvailable ? mic : micOff} alt="Mic icon"/>
                     </ButtonRecord>
                 </InputContainer>) : (
-                <ButtonRecord typeof='button' onClick={handleMicClick} style={{width: 56, height: 56,}}>
+
+                <ButtonRecord typeof='button' onClick={handleMicClick}
+                              style={{width: 56, height: 56, margin: '1rem', marginLeft: 'auto', marginRight: 'auto'}}>
                     <img src={micAvailable ? mic : micOff} alt="Mic icon"/>
                 </ButtonRecord>
             )
@@ -246,38 +257,3 @@ const ThinkingUi = styled.div`
     text-align: center;
 `
 
-async function recordAudio() {
-    // Ask query mic
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-
-    const mediaRecorder = new MediaRecorder(stream);
-    const audioChunks: BlobPart[] | undefined = [];
-
-    mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunks.push(e.data);
-    };
-
-    mediaRecorder.start();
-
-    return {
-        stop: () =>
-            new Promise((resolve) => {
-                mediaRecorder.onstop = () => {
-                    // Stop mic
-                    stream.getTracks().forEach(track => track.stop());
-
-                    const audioBlob = new Blob(audioChunks, {
-                        type: mediaRecorder.mimeType,
-                    });
-
-                    resolve({
-                        blob: audioBlob,
-                        url: URL.createObjectURL(audioBlob),
-                        type: audioBlob.type,
-                    });
-                };
-
-                mediaRecorder.stop();
-            }),
-    } as never;
-}
