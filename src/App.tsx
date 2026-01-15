@@ -2,7 +2,6 @@ import './App.css'
 import Chatbot from "./components/Chatbot.tsx";
 import {ErrorBoundary} from "react-error-boundary";
 import {Popover, PopoverContent, PopoverTrigger} from "./components/ui/Popover.tsx";
-import {Toaster} from "./components/ui/Sonner.tsx";
 import styled from "styled-components";
 import {useIsMobile} from "./components/ui/useMediaQuery.ts";
 import {BottomDrawer} from "./components/ui/Drawer.tsx";
@@ -48,7 +47,6 @@ function App() {
                     </ErrorBoundary>
                 </PopoverContent>
             </Popover>
-            <Toaster/>
         </WidgetStyled>
     )
 }
