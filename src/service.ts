@@ -6,7 +6,7 @@ class Service {
 
     constructor() {
         this.VITE_API_URL = import.meta.env.VITE_API_URL;
-        this.DH_ID = 181
+        this.DH_ID = 180
     }
 
     async getChatBotConfig(): Promise<ResponseConfigChatBotType> {

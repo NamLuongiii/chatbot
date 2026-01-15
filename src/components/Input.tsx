@@ -7,7 +7,7 @@ import soundclick from '../assets/select-sound.wav'
 import {toast} from "sonner";
 import {useMutation} from "@tanstack/react-query";
 import Service from "../service.ts";
-import type {ChatBotTextRequest, ResponseConfigChatBotType} from "../types.ts";
+import {type ChatBotTextRequest, ConnectionStatus, type ResponseConfigChatBotType} from "../types.ts";
 import {useAppState} from "../AppStateContext.tsx";
 
 type Props = {
@@ -21,7 +21,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [value, setValue] = useState('')
     const [showInput, setShowInput] = useState(isDesktop)
-    const {isVideoReady} = useAppState()
+    const {isVideoReady, connection} = useAppState()
 
     const streamRef = useRef<MediaStream | null>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -105,7 +105,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
         })
     }
 
-    if (!isVideoReady) return null;
+    if (!isVideoReady || connection !== ConnectionStatus.CONNECTED) return null;
 
     if (isPending) return <ThinkingUi>Thinking...</ThinkingUi>;
 

@@ -5,6 +5,7 @@ import {Role, SignalingClient} from "amazon-kinesis-video-streams-webrtc";
 import KinesisVideo from "aws-sdk/clients/kinesisvideo";
 import KinesisVideoSignalingChannels from "aws-sdk/clients/kinesisvideosignalingchannels";
 import {useAppState} from "../AppStateContext.tsx";
+import styled from "styled-components";
 
 type Props = {
     configChatbot: ResponseConfigChatBotType
@@ -418,7 +419,7 @@ export default function VideoChat({configChatbot, video, music}: Props) {
     }, [music?.musicAvatar.url, muted, music?.music_volume]);
 
 
-    return <div>
+    return <VideoWrapper>
         {music?.musicAvatar.url && (
             <audio
                 ref={audioRef}
@@ -429,7 +430,7 @@ export default function VideoChat({configChatbot, video, music}: Props) {
                 style={{display: "none"}}
             />
         )}
-        <video
+        <VideoStyled
             ref={defaultVideoRef}
             src={video.video_url}
             poster={video.image_url}
@@ -443,7 +444,7 @@ export default function VideoChat({configChatbot, video, music}: Props) {
             }}
         />
 
-        <video
+        <VideoStyled
             ref={remoteViewRef}
             style={{
                 ...videoStyles,
@@ -456,5 +457,18 @@ export default function VideoChat({configChatbot, video, music}: Props) {
             loop
             playsInline
         />
-    </div>
+    </VideoWrapper>
 }
+
+const VideoWrapper = styled.div`
+    //overflow: hidden;
+    //box-shadow: var(--shadow-light);
+`
+
+const VideoStyled = styled.video`
+    //position: relative;
+    //display: block;
+    //clip-path: inset(1px 1px);
+    //border: none;
+    //outline: none;
+`;

@@ -88,7 +88,10 @@ export function BottomDrawer({
                                  children,
                              }: BottomDrawerProps) {
     return (
-        <Drawer.Root open={open} onOpenChange={onOpenChange}>
+        <Drawer.Root open={open} onOpenChange={onOpenChange}
+            // dismissible={false}
+
+        >
             <Drawer.Portal>
                 {/*<Overlay/>*/}
                 <Content aria-describedby="drawer-1-desc">
