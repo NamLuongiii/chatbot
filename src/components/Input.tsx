@@ -1,11 +1,10 @@
-import stop from '../assets/stop.svg'
 import styled from "styled-components";
 import {useRef, useState} from "react";
 import soundclick from '../assets/select-sound.wav'
 import {useMutation} from "@tanstack/react-query";
 import Service from "../service.ts";
 import {type ChatBotTextRequest, ConnectionStatus, type ResponseConfigChatBotType} from "../types.ts";
-import {MdMic, MdMicOff, MdSend} from "react-icons/md";
+import {MdClose, MdMic, MdMicOff, MdSend, MdStop} from "react-icons/md";
 import {toast} from "sonner";
 import {useAppState} from "../AppStateContext.tsx";
 
@@ -119,16 +118,26 @@ export default function Input({configChatbot, isDesktop}: Props) {
         }
     }
 
+    const cancelRecording = () => {
+        setIsRecording(false)
+    }
+
     const isDisabled = !isVideoReady || connection !== ConnectionStatus.CONNECTED;
 
     if (isPending || isConvertingAudio) return <ThinkingUi>Thinking...</ThinkingUi>;
 
     return <Container>
         {isRecording && <RecordingContainer>
-            <p>🎙 Recording</p>
-            <ButtonRecording type='button' onClick={handleStopRecording}>
-                <img src={stop} alt="Mic icon"/>
+            <div>🎙 Recording</div>
+            {/*stop and send audio */}
+            <ButtonRecording type='button' onClick={handleStopRecording} className={isRecording ? 'animate' : ''}>
+                <MdStop size={26}/>
             </ButtonRecording>
+
+            {/*cancel recording */}
+            <BtnCancelRecording type='button' onClick={cancelRecording}>
+                <MdClose size={16}/>
+            </BtnCancelRecording>
         </RecordingContainer>}
 
         {!isRecording && (
@@ -157,7 +166,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
 
                 <ButtonRecord typeof='button' onClick={handleButton}
                               disabled={isDisabled}
-                              style={{width: 56, height: 56, margin: '1rem', marginLeft: 'auto', marginRight: 'auto'}}>
+                              style={{width: 56, height: 56, margin: '2rem', marginLeft: 'auto', marginRight: 'auto'}}>
                     {!micAvailable ? <MdMicOff size={24}/> : <MdMic size={24}/>}
                 </ButtonRecord>
             )
@@ -214,8 +223,14 @@ const InputContainer = styled.div`
 
 const RecordingContainer = styled.div`
     background: var(--primary-color);
-    padding: 1rem;
+    padding: 2rem;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+
 `
 
 const ButtonRecord = styled.button`
@@ -237,39 +252,52 @@ const ButtonRecord = styled.button`
 `
 
 const ButtonRecording = styled.button`
-    aspect-ratio: 1/1;
     border-radius: 50%;
     position: relative;
     border: none;
     cursor: pointer;
     display: inline-flex;
-    place-items: center;
-    padding: .5rem;
+    justify-content: center;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+    padding: 0.5rem;
+    color: white;
+    background-color: cornflowerblue;
 
-    &::before, &::after {
+    &::before,
+    &::after {
         content: "";
         position: absolute;
-        inset: -10px;
+        inset: -12px;
         border-radius: 50%;
-        border: 2px solid #ddd;
-        animation: ripple 1.6s infinite;
+        border: 4px solid #8fb3ff80;
+        opacity: 0;
+        transform: scale(0.8);
     }
 
-    &::after {
+    &.animate::before,
+    &.animate::after {
+        animation: ripple 2s infinite;
+        opacity: 1;
+    }
+
+    &.animate::after {
         animation-delay: 0.8s;
     }
 
     @keyframes ripple {
         0% {
-            transform: scale(0.7);
+            transform: scale(0.8);
             opacity: 1;
         }
         100% {
-            transform: scale(1.3);
+            transform: scale(1);
             opacity: 0;
         }
     }
 `
+
 
 const ThinkingUi = styled.div`
     position: absolute;
@@ -280,3 +308,12 @@ const ThinkingUi = styled.div`
     text-align: center;
 `
 
+const BtnCancelRecording = styled.button`
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    outline: none;
+`

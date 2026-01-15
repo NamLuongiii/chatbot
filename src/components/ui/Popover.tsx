@@ -55,6 +55,7 @@ const CloseButton = styled(PopoverPrimitive.Close)`
 
     background: none;
     border: none;
+    outline: none;
     padding: 0;
     cursor: pointer;
 
