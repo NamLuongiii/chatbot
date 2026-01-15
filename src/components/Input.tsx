@@ -119,7 +119,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
         }
     }
 
-    if (!isVideoReady || connection !== ConnectionStatus.CONNECTED) return null;
+    const isDisabled = !isVideoReady || connection !== ConnectionStatus.CONNECTED;
 
     if (isPending || isConvertingAudio) return <ThinkingUi>Thinking...</ThinkingUi>;
 
@@ -144,9 +144,9 @@ export default function Input({configChatbot, isDesktop}: Props) {
                             handleSend(value);
                         }
                     }}
-                        disabled={isPending}
+                        disabled={isDisabled}
                     />
-                    <ButtonRecord typeof='button' onClick={handleButton}>
+                    <ButtonRecord typeof='button' onClick={handleButton} disabled={isDisabled}>
                         {value ? (
                             <MdSend color='cornflowerblue'/>
                         ) : (
