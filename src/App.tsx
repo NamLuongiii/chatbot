@@ -31,7 +31,7 @@ function App() {
             <BottomDrawer open={open} onOpenChange={setOpen}>
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
                     <AppStateProvider>
-                        <Chatbot isDesktop={false}/>
+                        {open && <Chatbot isDesktop={false}/>}
                     </AppStateProvider>
                 </ErrorBoundary>
             </BottomDrawer>
