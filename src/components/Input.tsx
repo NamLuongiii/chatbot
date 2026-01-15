@@ -81,12 +81,13 @@ export default function Input({configChatbot, isDesktop}: Props) {
                     type: "audio/wav",
                 });
 
+                toast.message(audioBlob.size.toString())
+                
                 const message = await Service.convertAudioToText({
                     session_id: configChatbot?.sessionId,
                     audio: audioBlob,
                 });
 
-                toast.message(message)
 
                 handleSend(message)
             };
