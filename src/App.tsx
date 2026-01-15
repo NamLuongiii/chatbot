@@ -69,7 +69,7 @@ const WidgetStyled = styled.div`
 
 const ErrorBoundaryStyled = styled.div`
     background: var(--primary-color);
-    padding: 4rem;
+    padding: 2rem;
     box-shadow: var(--shadow-light);
     border-radius: 1rem;
 `
