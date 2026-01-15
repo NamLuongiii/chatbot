@@ -4,10 +4,9 @@ import {useRef, useState} from "react";
 import soundclick from '../assets/select-sound.wav'
 import {useMutation} from "@tanstack/react-query";
 import Service from "../service.ts";
-import {type ChatBotTextRequest, ConnectionStatus, type ResponseConfigChatBotType} from "../types.ts";
+import {type ChatBotTextRequest, type ResponseConfigChatBotType} from "../types.ts";
 import {MdMic, MdMicOff, MdSend} from "react-icons/md";
 import {toast} from "sonner";
-import {useAppState} from "../AppStateContext.tsx";
 
 type Props = {
     configChatbot: ResponseConfigChatBotType
@@ -20,7 +19,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
     const inputRef = useRef<HTMLInputElement>(null)
     const [value, setValue] = useState('')
     const [showInput, setShowInput] = useState(isDesktop)
-    const {isVideoReady, connection} = useAppState()
+    // const {isVideoReady, connection} = useAppState()
 
     const streamRef = useRef<MediaStream | null>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -89,32 +88,30 @@ export default function Input({configChatbot, isDesktop}: Props) {
 
                 toast.message(message)
 
-                sendMessage({
-                    session_id: configChatbot.sessionId,
-                    message,
-                })
+                handleSend(message)
             };
         }
     }
 
-    const handleSend = () => {
-        if (!value) return;
+    const handleSend = (value: string) => {
+        const message = value.trim()
+        if (!message) return;
         setValue('')
         sendMessage({
             session_id: configChatbot.sessionId,
-            message: value,
+            message,
         })
     }
 
     const handleButton = () => {
         if (value) {
-            handleSend()
+            handleSend(value)
         } else {
             handleStartRecording().then()
         }
     }
 
-    if (!isVideoReady || connection !== ConnectionStatus.CONNECTED) return null;
+    // if (!isVideoReady || connection !== ConnectionStatus.CONNECTED) return null;
 
     if (isPending) return <ThinkingUi>Thinking...</ThinkingUi>;
 
@@ -136,7 +133,7 @@ export default function Input({configChatbot, isDesktop}: Props) {
                         value={value}
                         onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                            handleSend();
+                            handleSend(value);
                         }
                     }}
                         disabled={isPending}
