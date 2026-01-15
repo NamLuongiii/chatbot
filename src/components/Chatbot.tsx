@@ -1,11 +1,9 @@
 import Input from "./Input.tsx";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import Service from "../service.ts";
 import styled from "styled-components";
 import VideoChat from "./VideoChat.tsx";
-import {useAppState} from "../AppStateContext.tsx";
 import {useEffect} from "react";
-import {ConnectionStatus} from "../types.ts";
 import {toast} from "sonner";
 
 type Props = {
@@ -14,7 +12,7 @@ type Props = {
 
 
 export default function Chatbot({isDesktop}: Props) {
-    const {connection} = useAppState()
+    // const {connection} = useAppState()
 
     const {data, isLoading} = useQuery({
         queryKey: ['get-avatar'],
@@ -22,7 +20,7 @@ export default function Chatbot({isDesktop}: Props) {
         staleTime: Infinity
     })
 
-    const {isPending: isPendingConfig, data: chatbotConfig, isFetched} = useQuery({
+    const {isPending: isPendingConfig, data: chatbotConfig} = useQuery({
         queryKey: ['get-chatbot-config'],
         queryFn: async () => {
             // get config from local storage
@@ -37,28 +35,26 @@ export default function Chatbot({isDesktop}: Props) {
             // return JSON.parse(config)
             return await Service.getChatBotConfig()
         },
-        throwOnError: true,
-        staleTime: Infinity
     })
 
-    const {mutate: refreshConfig, data: newChatbotConfig} = useMutation({
-        mutationKey: ['refresh-config'],
-        mutationFn: (sessionId: string) => Service.refreshConfig(sessionId),
-        onError: () => {
-            toast.error('Error refreshing config')
-        }
-    })
+    // const {mutate: refreshConfig, data: newChatbotConfig} = useMutation({
+    //     mutationKey: ['refresh-config'],
+    //     mutationFn: (sessionId: string) => Service.refreshConfig(sessionId),
+    //     onError: () => {
+    //         toast.error('Error refreshing config')
+    //     }
+    // })
 
     // Try refresh if a connection is not ready and config is fetched
-    useEffect(() => {
-        if (
-            connection !== ConnectionStatus.NEW &&
-            connection !== ConnectionStatus.CONNECTING &&
-            connection !== ConnectionStatus.CONNECTED &&
-            isFetched && chatbotConfig?.sessionId) {
-            refreshConfig(chatbotConfig?.sessionId)
-        }
-    }, [chatbotConfig?.sessionId, connection, isFetched, refreshConfig])
+    // useEffect(() => {
+    //     if (
+    //         connection !== ConnectionStatus.NEW &&
+    //         connection !== ConnectionStatus.CONNECTING &&
+    //         connection !== ConnectionStatus.CONNECTED &&
+    //         isFetched && chatbotConfig?.sessionId) {
+    //         refreshConfig(chatbotConfig?.sessionId)
+    //     }
+    // }, [chatbotConfig?.sessionId, connection, isFetched, refreshConfig])
 
     // End session
     useEffect(() => {
@@ -82,7 +78,7 @@ export default function Chatbot({isDesktop}: Props) {
         </ChatbotLoading>
     )
 
-    const config = newChatbotConfig || chatbotConfig;
+    const config = chatbotConfig;
 
     return <ChatbotContainer style={{
         width: isDesktop ? 360 : 'fit-content',

@@ -49,7 +49,7 @@ function App() {
                 <PopoverContent>
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
                         <AppStateProvider>
-                            <Chatbot isDesktop={true}/>
+                            {open && <Chatbot isDesktop={false}/>}
                         </AppStateProvider>
                     </ErrorBoundary>
                 </PopoverContent>

@@ -10,6 +10,7 @@ const queryClient = new QueryClient({
         queries: {
             retry: false,
             throwOnError: true,
+            refetchOnMount: true,
         },
     },
 })
