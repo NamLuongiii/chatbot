@@ -26,15 +26,16 @@ export default function Chatbot({isDesktop}: Props) {
         queryKey: ['get-chatbot-config'],
         queryFn: async () => {
             // get config from local storage
-            const config = localStorage.getItem('chatbot-config')
-
-            if (!config) {
-                const config = await Service.getChatBotConfig()
-                localStorage.setItem('chatbot-config', JSON.stringify(config))
-                return config
-            }
-
-            return JSON.parse(config)
+            // const config = localStorage.getItem('chatbot-config')
+            //
+            // if (!config) {
+            //     const config = await Service.getChatBotConfig()
+            //     localStorage.setItem('chatbot-config', JSON.stringify(config))
+            //     return config
+            // }
+            //
+            // return JSON.parse(config)
+            return await Service.getChatBotConfig()
         },
         throwOnError: true,
         staleTime: Infinity
@@ -59,6 +60,17 @@ export default function Chatbot({isDesktop}: Props) {
         }
     }, [chatbotConfig?.sessionId, connection, isFetched, refreshConfig])
 
+    // End session
+    useEffect(() => {
+        return () => {
+            if (!chatbotConfig?.sessionId) return;
+            console.log('Ending session')
+            Service.stopSession(chatbotConfig?.sessionId).catch(() => {
+                console.error('Error stopping session')
+                toast.error('Error stopping session')
+            })
+        }
+    }, [chatbotConfig?.sessionId])
 
     if (isLoading || isPendingConfig || isRefreshingConfig) return (
         <ChatbotLoading>

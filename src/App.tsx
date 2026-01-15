@@ -40,7 +40,7 @@ function App() {
 
     return (
         <WidgetStyled id="widget-chatbot-root">
-            <Popover>
+            <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                     <ButtonChat>
                         <TbMessageChatbot size={24}/>

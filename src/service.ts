@@ -6,7 +6,7 @@ class Service {
 
     constructor() {
         this.VITE_API_URL = import.meta.env.VITE_API_URL;
-        this.DH_ID = 181
+        this.DH_ID = 180
     }
 
     async getChatBotConfig(): Promise<ResponseConfigChatBotType> {
@@ -89,6 +89,17 @@ class Service {
         if (response.ok) {
             return json.data.text;
         } else {
+            throw new Error(json.message || response.statusText);
+        }
+    }
+
+    async stopSession(sessionId: string) {
+        const response = await fetch(`${this.VITE_API_URL}/chat-internal/end/${sessionId}`, {
+            method: 'delete',
+        })
+
+        if (!response.ok) {
+            const json = await response.json();
             throw new Error(json.message || response.statusText);
         }
     }
