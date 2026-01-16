@@ -22,6 +22,7 @@ function ErrorFallback({error, resetErrorBoundary}: { error: Error; resetErrorBo
 function App() {
     const [open, setOpen] = useState(false)
     const isMobile = useIsMobile()
+    console.log(isMobile)
 
     if (isMobile) return (
         <WidgetStyled id="widget-chatbot-root">
@@ -49,7 +50,7 @@ function App() {
                 <PopoverContent>
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
                         <AppStateProvider>
-                            {open && <Chatbot isDesktop={false}/>}
+                            {open && <Chatbot isDesktop={true}/>}
                         </AppStateProvider>
                     </ErrorBoundary>
                 </PopoverContent>

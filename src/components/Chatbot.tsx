@@ -1,10 +1,12 @@
 import Input from "./Input.tsx";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import Service from "../service.ts";
 import styled from "styled-components";
 import VideoChat from "./VideoChat.tsx";
 import {useEffect} from "react";
 import {toast} from "sonner";
+import {ConnectionStatus} from "../types.ts";
+import {useAppState} from "../AppStateContext.tsx";
 
 type Props = {
     isDesktop: boolean
@@ -12,7 +14,7 @@ type Props = {
 
 
 export default function Chatbot({isDesktop}: Props) {
-    // const {connection} = useAppState()
+    const {connection} = useAppState()
 
     const {data, isLoading} = useQuery({
         queryKey: ['get-avatar'],
@@ -20,53 +22,52 @@ export default function Chatbot({isDesktop}: Props) {
         staleTime: Infinity
     })
 
-    const {isPending: isPendingConfig, data: chatbotConfig} = useQuery({
+    const {isPending: isPendingConfig, data: chatbotConfig, isFetched} = useQuery({
         queryKey: ['get-chatbot-config'],
         queryFn: async () => {
             // get config from local storage
-            // const config = localStorage.getItem('chatbot-config')
-            //
-            // if (!config) {
-            //     const config = await Service.getChatBotConfig()
-            //     localStorage.setItem('chatbot-config', JSON.stringify(config))
-            //     return config
-            // }
-            //
-            // return JSON.parse(config)
-            return await Service.getChatBotConfig()
+            const config = localStorage.getItem('chatbot-config')
+
+            if (!config) {
+                const config = await Service.getChatBotConfig()
+                localStorage.setItem('chatbot-config', JSON.stringify(config))
+                return config
+            }
+
+            return JSON.parse(config)
         },
     })
 
-    // const {mutate: refreshConfig, data: newChatbotConfig} = useMutation({
-    //     mutationKey: ['refresh-config'],
-    //     mutationFn: (sessionId: string) => Service.refreshConfig(sessionId),
-    //     onError: () => {
-    //         toast.error('Error refreshing config')
-    //     }
-    // })
+    const {mutate: refreshConfig, data: newChatbotConfig} = useMutation({
+        mutationKey: ['refresh-config'],
+        mutationFn: (sessionId: string) => Service.refreshConfig(sessionId),
+        onError: () => {
+            toast.error('Error refreshing config')
+        }
+    })
 
     // Try refresh if a connection is not ready and config is fetched
-    // useEffect(() => {
-    //     if (
-    //         connection !== ConnectionStatus.NEW &&
-    //         connection !== ConnectionStatus.CONNECTING &&
-    //         connection !== ConnectionStatus.CONNECTED &&
-    //         isFetched && chatbotConfig?.sessionId) {
-    //         refreshConfig(chatbotConfig?.sessionId)
-    //     }
-    // }, [chatbotConfig?.sessionId, connection, isFetched, refreshConfig])
+    useEffect(() => {
+        if (
+            connection !== ConnectionStatus.NEW &&
+            connection !== ConnectionStatus.CONNECTING &&
+            connection !== ConnectionStatus.CONNECTED &&
+            isFetched && chatbotConfig?.sessionId) {
+            refreshConfig(chatbotConfig?.sessionId)
+        }
+    }, [chatbotConfig?.sessionId, connection, isFetched, refreshConfig])
 
     // End session
-    useEffect(() => {
-        return () => {
-            if (!chatbotConfig?.sessionId) return;
-            console.log('Ending session')
-            Service.stopSession(chatbotConfig?.sessionId).catch(() => {
-                console.error('Error stopping session')
-                toast.error('Error stopping session')
-            })
-        }
-    }, [chatbotConfig?.sessionId])
+    // useEffect(() => {
+    //     return () => {
+    //         if (!chatbotConfig?.sessionId) return;
+    //         console.log('Ending session')
+    //         Service.stopSession(chatbotConfig?.sessionId).catch(() => {
+    //             console.error('Error stopping session')
+    //             toast.error('Error stopping session')
+    //         })
+    //     }
+    // }, [chatbotConfig?.sessionId])
 
     if (isLoading || isPendingConfig || !chatbotConfig || !data) return (
         <ChatbotLoading>
@@ -78,7 +79,7 @@ export default function Chatbot({isDesktop}: Props) {
         </ChatbotLoading>
     )
 
-    const config = chatbotConfig;
+    const config = newChatbotConfig || chatbotConfig;
 
     return <ChatbotContainer style={{
         width: isDesktop ? 360 : 'fit-content',
