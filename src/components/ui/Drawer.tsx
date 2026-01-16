@@ -7,15 +7,6 @@ import {IoClose} from "react-icons/io5";
 
 /* ---------------- animations ---------------- */
 
-// const fadeIn = keyframes`
-//     from {
-//         opacity: 0
-//     }
-//     to {
-//         opacity: 1
-//     }
-// `
-
 const slideUp = keyframes`
     from {
         transform: translateY(100%)
@@ -26,13 +17,6 @@ const slideUp = keyframes`
 `
 
 /* ---------------- styles ---------------- */
-
-// const Overlay = styled(Drawer.Overlay)`
-//     position: fixed;
-//     inset: 0;
-//     background: rgba(0, 0, 0, 0.2);
-//     animation: ${fadeIn} 0.2s ease-out;
-// `
 
 const Content = styled(Drawer.Content)`
     position: fixed;
@@ -64,14 +48,6 @@ const Content = styled(Drawer.Content)`
         box-shadow: none;
     }
 `
-
-// const Handle = styled.div`
-//     width: 80px;
-//     height: 6px;
-//     border-radius: 999px;
-//     background: #e5e7eb;
-//     margin: 12px auto;
-// `
 
 const Body = styled.div`
     overflow-y: hidden;

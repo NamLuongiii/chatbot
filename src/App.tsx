@@ -7,7 +7,7 @@ import {useIsMobile} from "./components/ui/useMediaQuery.ts";
 import {BottomDrawer} from "./components/ui/Drawer.tsx";
 import {useState} from "react";
 import {AppStateProvider} from "./AppStateContext.tsx";
-import {TbMessageChatbot} from "react-icons/tb";
+import {ButtonChat} from "./components/ui/ButtonChat.tsx";
 
 function ErrorFallback({error, resetErrorBoundary}: { error: Error; resetErrorBoundary: () => void }) {
     return (
@@ -22,17 +22,15 @@ function ErrorFallback({error, resetErrorBoundary}: { error: Error; resetErrorBo
 function App() {
     const [open, setOpen] = useState(false)
     const isMobile = useIsMobile()
-    console.log(isMobile)
+
 
     if (isMobile) return (
         <WidgetStyled id="widget-chatbot-root">
-            <ButtonChat onClick={() => setOpen(true)}>
-                <TbMessageChatbot size={24}/>
-            </ButtonChat>
+            <ButtonChat onClick={() => setOpen(true)}/>
             <BottomDrawer open={open} onOpenChange={setOpen}>
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
                     <AppStateProvider>
-                        {open && <Chatbot isDesktop={false}/>}
+                        <Chatbot isDesktop={false} onClose={() => setOpen(false)}/>
                     </AppStateProvider>
                 </ErrorBoundary>
             </BottomDrawer>
@@ -43,14 +41,12 @@ function App() {
         <WidgetStyled id="widget-chatbot-root">
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <ButtonChat>
-                        <TbMessageChatbot size={24}/>
-                    </ButtonChat>
+                    <ButtonChat/>
                 </PopoverTrigger>
                 <PopoverContent>
                     <ErrorBoundary FallbackComponent={ErrorFallback}>
                         <AppStateProvider>
-                            {open && <Chatbot isDesktop={true}/>}
+                            <Chatbot isDesktop={true} onClose={() => setOpen(false)}/>
                         </AppStateProvider>
                     </ErrorBoundary>
                 </PopoverContent>
@@ -62,10 +58,7 @@ function App() {
 export default App
 
 const WidgetStyled = styled.div`
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    z-index: 1000;
+
 `
 
 const ErrorBoundaryStyled = styled.div`
@@ -75,14 +68,3 @@ const ErrorBoundaryStyled = styled.div`
     border-radius: 1rem;
 `
 
-const ButtonChat = styled.span`
-    width: 50px;
-    height: 50px;
-    display: flex;
-    background: cornflowerblue;
-    color: white;
-    justify-content: center;
-    align-items: center;
-    border-radius: 32px;
-    cursor: pointer;
-`

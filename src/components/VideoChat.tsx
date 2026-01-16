@@ -465,6 +465,5 @@ const VideoWrapper = styled.div`
 
 const VideoStyled = styled.video`
     max-width: 100%;
-    clip-path: inset(1px 1px);
 `;
 

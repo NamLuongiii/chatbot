@@ -45,6 +45,11 @@ const Content = styled(PopoverPrimitive.Content)`
     &[data-state="closed"] {
         animation: ${slideDown} 0.12s ease-in;
     }
+
+    box-shadow: var(--shadow-dark);
+    width: 300px;
+    border-radius: 1rem;
+    overflow: hidden;
 `
 
 const CloseButton = styled(PopoverPrimitive.Close)`

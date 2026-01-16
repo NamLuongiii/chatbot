@@ -1,28 +1,27 @@
 import Input from "./Input.tsx";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import Service from "../service.ts";
 import styled from "styled-components";
 import VideoChat from "./VideoChat.tsx";
-import {useEffect} from "react";
-import {toast} from "sonner";
-import {ConnectionStatus} from "../types.ts";
-import {useAppState} from "../AppStateContext.tsx";
+import Loading from "./ui/Loading.tsx";
+import {ErrorUI} from "./ui/ErrorUI.tsx";
 
 type Props = {
     isDesktop: boolean
+    onClose: () => void
 }
 
 
-export default function Chatbot({isDesktop}: Props) {
-    const {connection} = useAppState()
+export default function Chatbot({isDesktop, onClose}: Props) {
+    // const {connection} = useAppState()
 
-    const {data, isLoading} = useQuery({
+    const {data, isLoading, error} = useQuery({
         queryKey: ['get-avatar'],
         queryFn: () => Service.getAvatar(),
         staleTime: Infinity
     })
 
-    const {isPending: isPendingConfig, data: chatbotConfig, isFetched} = useQuery({
+    const {isPending: isPendingConfig, data: chatbotConfig, error: configError} = useQuery({
         queryKey: ['get-chatbot-config'],
         queryFn: async () => {
             // get config from local storage
@@ -34,28 +33,31 @@ export default function Chatbot({isDesktop}: Props) {
                 return config
             }
 
-            return JSON.parse(config)
+            // try to refresh config
+            const oldConfig = JSON.parse(config)
+            return await Service.refreshConfig(oldConfig.sessionId)
+            // return JSON.parse(config)
         },
     })
 
-    const {mutate: refreshConfig, data: newChatbotConfig} = useMutation({
-        mutationKey: ['refresh-config'],
-        mutationFn: (sessionId: string) => Service.refreshConfig(sessionId),
-        onError: () => {
-            toast.error('Error refreshing config')
-        }
-    })
+    // const {mutate: refreshConfig, data: newChatbotConfig} = useMutation({
+    //     mutationKey: ['refresh-config'],
+    //     mutationFn: (sessionId: string) => Service.refreshConfig(sessionId),
+    //     onError: () => {
+    //         toast.error('Error refreshing config')
+    //     }
+    // })
 
     // Try refresh if a connection is not ready and config is fetched
-    useEffect(() => {
-        if (
-            connection !== ConnectionStatus.NEW &&
-            connection !== ConnectionStatus.CONNECTING &&
-            connection !== ConnectionStatus.CONNECTED &&
-            isFetched && chatbotConfig?.sessionId) {
-            refreshConfig(chatbotConfig?.sessionId)
-        }
-    }, [chatbotConfig?.sessionId, connection, isFetched, refreshConfig])
+    // useEffect(() => {
+    //     if (
+    //         connection !== ConnectionStatus.NEW &&
+    //         connection !== ConnectionStatus.CONNECTING &&
+    //         connection !== ConnectionStatus.CONNECTED &&
+    //         isFetched && chatbotConfig?.sessionId) {
+    //         refreshConfig(chatbotConfig?.sessionId)
+    //     }
+    // }, [chatbotConfig?.sessionId, connection, isFetched, refreshConfig])
 
     // End session
     // useEffect(() => {
@@ -69,21 +71,15 @@ export default function Chatbot({isDesktop}: Props) {
     //     }
     // }, [chatbotConfig?.sessionId])
 
-    if (isLoading || isPendingConfig || !chatbotConfig || !data) return (
-        <ChatbotLoading>
-            <div className="wave-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </ChatbotLoading>
+    if (isLoading || isPendingConfig) return (
+        <Loading/>
     )
 
-    const config = newChatbotConfig || chatbotConfig;
+    if (error || configError) return (<ErrorUI onTryAgain={onClose}/>)
 
-    return <ChatbotContainer style={{
-        width: isDesktop ? 360 : 'fit-content',
-    }}>
+    const config = chatbotConfig;
+
+    return <ChatbotContainer>
         {!!data && !!config && (
             <>
                 <VideoChat video={data?.data.video} music={data?.data.avatar} configChatbot={config}/>
@@ -98,19 +94,4 @@ const ChatbotContainer = styled.div`
     border-radius: 1rem;
     overflow: hidden;
     box-shadow: var(--shadow-light);
-    max-height: 70vh;
-    max-width: 100vw;
-
-    @media (max-width: 768px) {
-        max-height: 60vh; // for mobile
-    }
 `
-
-const ChatbotLoading = styled.div`
-    background: var(--primary-color);
-    padding: 4rem;
-    box-shadow: var(--shadow-light);
-    border-radius: 1rem;
-
-`
-
