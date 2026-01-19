@@ -34,9 +34,9 @@ export default function Chatbot({isDesktop, onClose}: Props) {
             }
 
             // try to refresh config
-            const oldConfig = JSON.parse(config)
-            return await Service.refreshConfig(oldConfig.sessionId)
-            // return JSON.parse(config)
+            // const oldConfig = JSON.parse(config)
+            // return await Service.refreshConfig(oldConfig.sessionId)
+            return JSON.parse(config)
         },
     })
 

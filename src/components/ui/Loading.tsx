@@ -64,15 +64,21 @@ const LoadingUI = styled(motion.div)`
     gap: 1rem;
     width: 100%;
     min-height: 400px;
+    padding: 2rem;
+    border-radius: 1rem;
 
     background: #9ec0ff;
     background: var(--bg-gradient);
+
+    @media (max-width: 768px) {
+        min-height: 300px;
+    }
 `
 
 const Spinner = styled(motion.div)`
     width: 40px;
     height: 40px;
-    border: 4px solid var(--primary-color);
+    border: 4px solid var(--loading-color);
     border-radius: 50%;
     border-top-color: transparent;
 

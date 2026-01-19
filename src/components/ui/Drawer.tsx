@@ -28,19 +28,13 @@ const Content = styled(Drawer.Content)`
     margin: 0 auto;
 
     border-radius: 16px 16px 0 0;
-    background: white;
+    background: transparent;
     animation: ${slideUp} 0.25s ease-out;
 
     max-height: 90vh;
     display: flex;
     flex-direction: column;
 
-    @media (min-width: 768px) {
-        left: 50%;
-        transform: translateX(-50%);
-        width: 420px;
-        border-radius: 16px;
-    }
 
     &:focus,
     &:focus-visible {

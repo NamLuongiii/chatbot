@@ -55,7 +55,7 @@ export const ErrorUI = ({onTryAgain}: Props) => {
                 style={{display: "flex", flexDirection: "column", gap: "0.25rem"}}
             >
                 <div>Cannot create a session right now. Please try later.</div>
-                <div style={{opacity: 0.7}}>Error creating session</div>
+                <div>Error creating session</div>
             </motion.div>
 
             {/* Try again button */}
@@ -72,7 +72,7 @@ export const ErrorUI = ({onTryAgain}: Props) => {
 
             <motion.div
                 variants={itemVariants}
-                style={{fontSize: 'var(--text-small)'}}
+                style={{fontSize: 'var(--text-small)', color: 'var(--text-secondary)'}}
             >
                 If the problem persists, please contact support.
             </motion.div>
@@ -82,34 +82,34 @@ export const ErrorUI = ({onTryAgain}: Props) => {
 
 const ErrorUIStyled = styled(motion.div)`
     padding: 2rem 1rem;
-    background-color: #FFE9C4;
+    background-color: var(--error-color-modal-bg);
     display: flex;
     flex-direction: column;
     gap: 2rem;
     align-items: center;
     text-align: center;
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
 `
 
 const ErrorIcon = styled(motion.div)`
-    position: relative;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: var(--error-200);
-    padding: 1rem;
+    width: 50px;
+    height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 50%;
+    background-color: var(--error-color-icon-bg);
 
     & > * {
-        color: var(--error-color)
+        color: var(--error-color-icon)
     }
 `
 
 const Button = styled(motion.button)`
     border: none;
     outline: none;
-    background: var(--primary-color);
+    background: var(--loading-color);
     padding: .5rem 1rem;
     border-radius: .5rem;
     display: flex;
